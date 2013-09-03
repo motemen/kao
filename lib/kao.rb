@@ -68,9 +68,11 @@ module Kao
       file = files.first || 'kao.txt'
       file.open('a') do |io|
         if options[:multiline]
+          kaoes = []
           STDIN.each_line do |kao|
             io.puts kao
             count += 1
+            kaoes << kao
           end
         else
           kaoes.each do |kao|
@@ -79,7 +81,7 @@ module Kao
           end
         end
       end
-      STDERR.puts "added #{count} kao(es)."
+      run_git :commit, '-a', '-m', "added #{kaoes.join(',')}"
     end
 
     desc 'list', 'show kao list'
