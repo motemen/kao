@@ -35,7 +35,7 @@ module Kao
         option = if args.last.kind_of?(Hash) then args.pop else {} end
 
         command = ['git'] + args.map { |a| a.to_s }
-        Dir.chdir(config.repo.to_s) do
+        Dir.chdir(option[:nochdir] ? Dir.pwd : config.repo.to_s) do
           if option[:capture]
             out, s = Open3.capture2(*command)
             abort unless s.success?
@@ -50,9 +50,9 @@ module Kao
     desc 'init [<url>]', 'initialize local kao repository'
     def init(url=nil)
       if url
-        run_git(:clone, url, config.repo)
+        run_git(:clone, url, config.repo, { :nochdir => true })
       else
-        run_git(:init, config.repo)
+        run_git(:init, config.repo, { :nochdir => true })
       end
     end
 
