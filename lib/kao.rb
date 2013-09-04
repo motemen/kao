@@ -1,5 +1,6 @@
 require 'kao/version'
 require 'thor'
+require 'clipboard'
 require 'pathname'
 require 'open3'
 
@@ -29,6 +30,21 @@ module Kao
           .split(/\0/).map do |filename|
             config.repo + filename
           end
+      end
+
+      def search(query)
+        results = []
+
+        files.each do |file|
+          File.open(file) do |io|
+            io.each_line do |line|
+              next if query and not line.include? query
+              results << line
+            end
+          end
+        end
+
+        results
       end
 
       def run_git(*args)
@@ -83,15 +99,21 @@ module Kao
       run_git :commit, '-a', '-m', "added #{kaoes.join(',')}"
     end
 
-    desc 'list', 'show kao list'
-    def list
-      files.each do |file|
-        File.open(file) do |io|
-          io.each_line do |line|
-            puts line
-          end
-        end
+    desc 'list [<query>]', 'show kao list'
+    def list(query = nil)
+      search(query).each do |line|
+        puts line
       end
+    end
+
+    desc 'copy [<query>]', 'copy kao to clipboard'
+    def copy(query = nil)
+      kao = search(query).sample
+      kao.chomp!
+
+      Clipboard.copy(kao)
+
+      puts "Copied #{kao} to clipboard."
     end
   end
 end
