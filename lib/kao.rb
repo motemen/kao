@@ -68,7 +68,6 @@ module Kao
       file = files.first || 'kao.txt'
       file.open('a') do |io|
         if options[:multiline]
-          kaoes = []
           STDIN.each_line do |kao|
             io.puts kao
             count += 1
