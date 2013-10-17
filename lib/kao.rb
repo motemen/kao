@@ -81,7 +81,7 @@ module Kao
     option :multiline, :type => :boolean, :aliases => [:m]
     def add(*kaoes)
       count = 0
-      file = files.first || 'kao.txt'
+      file = files.first || config.repo + 'kao.txt'
       file.open('a') do |io|
         if options[:multiline]
           STDIN.each_line do |kao|
@@ -89,6 +89,10 @@ module Kao
             count += 1
             kaoes << kao
           end
+        elsif kaoes.empty?
+          kao = STDIN.readline.chomp
+          io.puts kao
+          kaoes << kao
         else
           kaoes.each do |kao|
             io.puts kao
